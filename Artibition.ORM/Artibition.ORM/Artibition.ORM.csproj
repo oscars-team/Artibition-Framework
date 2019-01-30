@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>arti.orm</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Mapper\EntityMapper.T.cs" />
+    <Compile Remove="SQLBuilder\SQL.Select.cs" />
+  </ItemGroup>
+
+</Project>
