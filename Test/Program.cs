@@ -7,10 +7,12 @@ namespace Test
     class Program
     {
         static void Main(string[] args)
+
         {
             //var sql = new SQL().Select<User>().Where<User>(p => p.name == "leo").And<User>(p => p.age == 10);
+            int? age = 1;
             var name = "leo";
-            Expression<Func<User, bool>> someExpr = tb1 => tb1.name == name;
+            Expression<Func<User, bool>> someExpr = tb1 => tb1.age == age && tb1.name == name;
             var builder = new WhereBuilder();
             builder.Visit(someExpr.Body);
             Console.WriteLine();
@@ -32,12 +34,14 @@ namespace Test
                 case ExpressionType.Add:
                     Console.Write(" + ");
                     break;
-
                 case ExpressionType.Divide:
                     Console.Write(" / ");
                     break;
                 case ExpressionType.Equal:
                     Console.Write(" = ");
+                    break;
+                case ExpressionType.AndAlso:
+                    Console.Write(" and ");
                     break;
             }
 
@@ -61,16 +65,16 @@ namespace Test
                         case ExpressionType.Constant: //表示为一个常数
                             var cons = node.Expression as ConstantExpression;
                             var t = cons.Type;
-                            var value = getMemberValue(node, cons);
+                            var value = getMemberConstValue(node, cons);
+                            Console.Write(value.ToString());
                             break;
                     }
-                    Console.Write("leo");
                     break;
             }
             return node;
         }
 
-        private object getMemberValue(MemberExpression mbExp, ConstantExpression consExp)
+        private object getMemberConstValue(MemberExpression mbExp, ConstantExpression consExp)
         {
             var value = consExp.Value;
             var name = mbExp.Member.Name;
