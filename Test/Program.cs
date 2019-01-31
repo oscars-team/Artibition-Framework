@@ -10,9 +10,9 @@ namespace Test
 
         {
             //var sql = new SQL().Select<User>().Where<User>(p => p.name == "leo").And<User>(p => p.age == 10);
-            int? age = 1;
+            var user = new User() { age = 10, name = "leo" };
             var name = "leo";
-            Expression<Func<User, bool>> someExpr = tb1 => tb1.age == age && tb1.name == name;
+            Expression<Func<User, bool>> someExpr = tb1 => tb1.name == user.name;
             var builder = new WhereBuilder();
             builder.Visit(someExpr.Body);
             Console.WriteLine();
@@ -54,6 +54,7 @@ namespace Test
 
         protected override Expression VisitMember(MemberExpression node)
         {
+            object value = null;
             switch (node.Expression.NodeType) {
                 // 固定参数
                 case ExpressionType.Parameter:
@@ -61,39 +62,102 @@ namespace Test
                     Console.Write($"{param.Name}.{node.Member.Name}");
                     break;
                 case ExpressionType.Constant:
-                    switch (node.Expression.NodeType) {
-                        case ExpressionType.Constant: //表示为一个常数
-                            var cons = node.Expression as ConstantExpression;
-                            var t = cons.Type;
-                            var value = getMemberConstValue(node, cons);
-                            Console.Write(value.ToString());
-                            break;
-                    }
+                    value = getConstantValue(node, node.Expression as ConstantExpression);
+                    Console.Write(value.ToString());
                     break;
+                case ExpressionType.MemberAccess:
+                    value = getMemberAccessValue(node, node.Expression as MemberExpression);
+                    Console.WriteLine(value.ToString());
+                    break;
+
             }
             return node;
+            //return VisitMember(node, node.Expression);
         }
 
-        private object getMemberConstValue(MemberExpression mbExp, ConstantExpression consExp)
+        /// <summary>
+        /// 获取常量表达式中常量的值
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private object getConstantValue(MemberExpression root, ConstantExpression node)
         {
-            var value = consExp.Value;
-            var name = mbExp.Member.Name;
-            var type = consExp.Type;
-            var field = type.GetField(name) ?? type.GetField(name, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (field != null)
-                return field.GetValue(value);
-            else {
-                var prop = type.GetProperty(name) ?? type.GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (prop != null) {
-                    return prop.GetValue(value, null);
-                }
-            }
+            /**
+             *  类似于：
+             *  var name = 'test'
+             *  p=>p.prop == name
+             * 
+             */
+            var rootExp = root as MemberExpression;
+            var propName = rootExp.Member.Name;
+            var propType = node.Type;
+            var prop = propType.GetField(propName);
+            if (prop != null)
+                return prop.GetValue(node.Value);
+
             return null;
+            //var value = node.Value;
+            //var name = root.Member.Name;
+            //var type = consExp.Type;
+            //var field = type.GetField(name) ?? type.GetField(name, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            //if (field != null)
+            //    return field.GetValue(value);
+            //else {
+            //    var prop = type.GetProperty(name) ?? type.GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            //    if (prop != null) {
+            //        return prop.GetValue(value, null);
+            //    }
+            //}
+            //return null;
         }
 
+        /// <summary>
+        /// 获取属性访问表达式所访问的属性值
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private object getMemberAccessValue(MemberExpression root, MemberExpression node)
+        {
+            switch (node.Expression.NodeType) {
+                /**
+                 *  表达类似与：
+                 *  var obj = new WhateveryClass(){ prop1 = 1, prop2 = "2" }
+                 *  p=>p.prop == obj.prop1
+                 */
+                case ExpressionType.Constant:
+
+                    break;
+            }
+            return getMemberAccessValue(root, node.Expression as MemberExpression);
+        }
+        //private object getMemberAccessValue(Expression root, Expression node)
+        //{
+        //    var value = consExp.Value;
+        //    var name = mbExp.Member.Name;
+        //    var type = consExp.Type;
+        //    var field = type.GetField(name) ?? type.GetField(name, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        //    if (field != null)
+        //        return field.GetValue(value);
+        //    else {
+        //        var prop = type.GetProperty(name) ?? type.GetProperty(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        //        if (prop != null) {
+        //            return prop.GetValue(value, null);
+        //        }
+        //    }
+        //    return null;
+        //}
+
+        /// <summary>
+        /// 表达式为一个常量时执行
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-
+            // 表达式类似于 p=>p.proprty == 1, p=>p.property == "123"
+            Console.Write(node.Value);
             return node;
         }
 
