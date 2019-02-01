@@ -8,9 +8,12 @@ namespace Artibition.ORM.SQLBuilder
     public class SQLWhere : ISQLWhere
     {
         public SQL Sql { get; set; }
-        private Expression _where;
-        private SQLAlias _alias { get => Sql.Alias; }
-        public SQLWhere(SQL sql, Expression where)
+        private LambdaExpression _where;
+        public Expression GetExpression()
+        {
+            return _where.Body;
+        }
+        public SQLWhere(SQL sql, LambdaExpression where)
         {
             Sql = sql;
             _where = where;
@@ -18,14 +21,12 @@ namespace Artibition.ORM.SQLBuilder
 
         public ISQLWhere And<TEntity>(string alias, Expression<Func<TEntity, bool>> where)
         {
-            if (!_alias.Identify(alias)) throw new Exception($"构造SQL结构时没有找到定义的别名\"{alias}\"");
             _where = Expression.Lambda(Expression.AndAlso(_where, where));
             return this;
         }
 
         public ISQLWhere And<TEntity>(Expression<Func<TEntity, bool>> where)
         {
-            (where as LambdaExpression).ReplaceParametermeterName(_alias.LastCreatedAlias);
             _where = Expression.Lambda(Expression.AndAlso((_where as LambdaExpression).Body, (where as LambdaExpression).Body));
             return this;
         }
@@ -62,35 +63,35 @@ namespace Artibition.ORM.SQLBuilder
 
     }
 
-    public class ParameterVisitor : ExpressionVisitor
-    {
-        private string _replaceName;
-        public static Expression ReplaceParameter(Expression p, string replaceName)
-        {
-            return new ParameterVisitor(replaceName).Visit(p);
-        }
+    //public class ParameterVisitor : ExpressionVisitor
+    //{
+    //    private string _replaceName;
+    //    public static Expression ReplaceParameter(Expression p, string replaceName)
+    //    {
+    //        return new ParameterVisitor(replaceName).Visit(p);
+    //    }
 
-        public ParameterVisitor(string replaceName)
-        {
-            _replaceName = replaceName;
-        }
+    //    public ParameterVisitor(string replaceName)
+    //    {
+    //        _replaceName = replaceName;
+    //    }
 
-        protected override Expression VisitParameter(ParameterExpression p)
-        {
-            ParameterExpression replacement = Expression.Parameter(p.Type, _replaceName);
-            return base.VisitParameter(p);
-        }
-    }
+    //    protected override Expression VisitParameter(ParameterExpression p)
+    //    {
+    //        ParameterExpression replacement = Expression.Parameter(p.Type, _replaceName);
+    //        return base.VisitParameter(p);
+    //    }
+    //}
 
 
-    public static class ExpressionExtention
-    {
-        public static void ReplaceParametermeterName(this LambdaExpression expression, string alias)
-        {
-            var equal = expression.Body as BinaryExpression;
-            var member = equal.Left as MemberExpression;
-            var param = member.Expression as ParameterExpression;
-            ParameterVisitor.ReplaceParameter(param, alias);
-        }
-    }
+    //public static class ExpressionExtention
+    //{
+    //    public static void ReplaceParametermeterName(this LambdaExpression expression, string alias)
+    //    {
+    //        var equal = expression.Body as BinaryExpression;
+    //        var member = equal.Left as MemberExpression;
+    //        var param = member.Expression as ParameterExpression;
+    //        ParameterVisitor.ReplaceParameter(param, alias);
+    //    }
+    //}
 }

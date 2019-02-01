@@ -47,7 +47,7 @@ namespace Artibition.ORM.Mapper
 
         public void Register<TEntity>()
         {
-            map(typeof(TEntity), this);
+            Map(typeof(TEntity), this);
         }
 
         public string GetTableName()
