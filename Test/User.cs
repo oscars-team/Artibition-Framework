@@ -5,6 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 namespace Test
 {
+    public class Room
+    {
+        public List<User> users { get; set; }
+    }
     public class User
     {
         public string name { get; set; }
