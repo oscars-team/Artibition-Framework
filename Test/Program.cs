@@ -11,7 +11,11 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            var sql = new SQL().Select<User>().Where<User>(u => u.name == "leo").And<User>(u => u.age == 12).Compile();
+            var sql = new SQL().Select<User>()
+                               .As("u")
+                               .Where<User>(u => u.name == "leo")
+                               .And<User>(u => u.age == 12)
+                               .Compile();
             Console.WriteLine(sql);
             Console.ReadLine();
         }

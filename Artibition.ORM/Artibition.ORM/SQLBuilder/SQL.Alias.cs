@@ -28,15 +28,5 @@ namespace Artibition.ORM.SQLBuilder
             lastAlias = alias;
             lastType = t;
         }
-        /// <summary>
-        /// 验证别名是否存在
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        public bool Verify(string alias)
-        {
-            return this[alias] != null;
-        }
-
     }
 }

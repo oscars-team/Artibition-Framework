@@ -9,75 +9,97 @@ namespace Artibition.ORM.SQLBuilder
 {
     public partial class SQLCompiler : ExpressionVisitor, ISQLCompile
     {
-
-        private StringBuilder selectCompilerStr;
-        private StringBuilder whereCompilerStr;
-
-        public SQLCompiler()
+        public SQL Sql { get; }
+        private StringBuilder _selectorCompilerStr;
+        private StringBuilder _whereCompilerStr;
+        public SQLCompiler(SQL sql)
         {
+            Sql = sql;
         }
-        private string compileSelect()
+        private string compileSelector()
         {
-            throw new NotImplementedException();
+            Expression selector = Sql.SelectorExpression;
+            IEntityMapper selectorMapper = Sql.SelectorMapper;
+            _selectorCompilerStr = new StringBuilder();
+            if (selector == null) {
+                _selectorCompilerStr?.Append("SELECT ");
+                _selectorCompilerStr?.Append(
+                    selectorMapper.Columns.Length == 0
+                    ? "*"
+                    : string.Join(", ", selectorMapper.Columns)
+                );
+            }
+            else {
+                _selectorCompilerStr?.Append("SELECT ");
+                this.Visit(selector);
+                _selectorCompilerStr?.TrimComma();
+            }
+            _selectorCompilerStr?.Append(" FROM ");
+            _selectorCompilerStr?.Append(selectorMapper?.GetTableName());
+            return _selectorCompilerStr?.ToString();
         }
-        private string compileWhere(Expression where)
+        private string compileWhere()
         {
-            whereCompilerStr = new StringBuilder();
+            Expression where = Sql.WhereExpression;
+
+            _whereCompilerStr = new StringBuilder();
             if (where != null) {
-                whereCompilerStr.Append(" WHERE ");
+                _whereCompilerStr?.Append(" WHERE ");
                 this.Visit(where);
             }
-            return whereCompilerStr.ToString();
+            return _whereCompilerStr?.ToString();
         }
 
-        public string Compile(SQL sql)
+        public string Compile()
         {
-            return compileWhere(sql.WhereExpression);
+            string select = compileSelector();
+            string where = compileWhere();
+            return $"{select} {where}";
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            whereCompilerStr.Append("(");
+            _whereCompilerStr.Append("(");
             this.Visit(node.Left);
 
             switch (node.NodeType) {
                 case ExpressionType.Add:
-                    whereCompilerStr.Append(" + ");
+                    _whereCompilerStr?.Append(" + ");
                     break;
                 case ExpressionType.Subtract:
-                    whereCompilerStr.Append(" - ");
+                    _whereCompilerStr?.Append(" - ");
                     break;
                 case ExpressionType.Multiply:
-                    whereCompilerStr.Append(" * ");
+                    _whereCompilerStr?.Append(" * ");
                     break;
                 case ExpressionType.Divide:
-                    whereCompilerStr.Append(" / ");
+                    _whereCompilerStr?.Append(" / ");
                     break;
                 case ExpressionType.Equal:
-                    whereCompilerStr.Append(" = ");
+                    _whereCompilerStr?.Append(" = ");
                     break;
 
                 case ExpressionType.And:
                 case ExpressionType.AndAlso:
-                    whereCompilerStr.Append(" AND ");
+                    _whereCompilerStr?.Append(" AND ");
                     break;
 
                 case ExpressionType.Not:
-                    whereCompilerStr.Append(" NOT ");
+                    _whereCompilerStr?.Append(" NOT ");
                     break;
 
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    whereCompilerStr.Append(" OR ");
+                    _whereCompilerStr?.Append(" OR ");
                     break;
 
                 case ExpressionType.Modulo:
-                    whereCompilerStr.Append(" % ");
+                    _whereCompilerStr?.Append(" % ");
                     break;
             }
 
             this.Visit(node.Right);
-            whereCompilerStr.Append(")");
+            _whereCompilerStr?.Append(")");
             return node;
         }
 
@@ -87,10 +109,25 @@ namespace Artibition.ORM.SQLBuilder
             Expression expression = searchMemberExpressionTree(node, node.Expression, out value);
             if (expression.NodeType == ExpressionType.Parameter) {
                 var param = node.Expression as ParameterExpression;
-                whereCompilerStr.Append($"{param.Name}.{node.Member.Name}");
+                var mapper = EntityMapper.GetMapper(expression.Type);
+                string alias = param.Name;
+                if (Sql.Alias.Count == 0) {
+                    // 如果别名中没有数据，此时做隐式转变，去掉所有别名的显示
+                    _whereCompilerStr?.Append($"{mapper.GetColumnName(node.Member.Name)}");
+                }
+                else {
+                    if (Sql.Alias.ContainsKey(alias))
+                        // 如果此时别名中有数据，而且调用了别名，视为刻意使用别名
+                        // 此时需要对别名做验证，如果验证失败，抛出异常
+                        // 
+                        _whereCompilerStr?.Append($"{alias}.{mapper.GetColumnName(node.Member.Name)}");
+                    else
+                        throw new Exception($"SQLCompiler.VisitMember Error: 你正在有意使用别名(As)，但在别名集合中没找到\"{alias}\"。尝试检查在Expression中使用的参数名是否在方法As()中定义过。'");
+                }
+                _selectorCompilerStr?.Append($"{param.Name}.{node.Member.Name},");
             }
             else if (expression.NodeType == ExpressionType.Constant) {
-                whereCompilerStr.Append(value.ToString());
+                _whereCompilerStr?.Append(value.ToString());
             }
             return node;
         }
@@ -151,16 +188,15 @@ namespace Artibition.ORM.SQLBuilder
         protected override Expression VisitConstant(ConstantExpression node)
         {
             // 表达式类似于 p=>p.proprty == 1, p=>p.property == "123"
-            whereCompilerStr.Append(node.Value);
+            _whereCompilerStr?.Append(node.Value);
             return node;
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            whereCompilerStr.Append(node.Name);
+            _whereCompilerStr?.Append(node.Name);
             return node;
         }
-
 
     }
 }

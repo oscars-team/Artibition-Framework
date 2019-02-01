@@ -5,23 +5,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 namespace Test
 {
-    public class Room
-    {
-        public List<User> users { get; set; }
-    }
     public class User
     {
         public string name { get; set; }
         public int age { get; set; }
+        public bool isMale { get; set; }
     }
 
-    public class UserMapper : EntityMapper
+    public class UserMapper : EntityMapper<User>
     {
         public UserMapper()
         {
             this.Table("User")
-                .PrimaryKeys<User>(p => p.name)
-                .Register<User>();
+                .PrimaryKeys(p => p.name)
+                .Column(p => p.name, "ORM_Name")
+                .Column(p => p.age, "ORM_Age")
+                .Column(p => p.isMale, "ORM_IsMale")
+                .Register();
         }
     }
 }

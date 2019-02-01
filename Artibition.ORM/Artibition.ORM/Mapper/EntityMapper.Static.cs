@@ -14,7 +14,7 @@ namespace Artibition.ORM.Mapper
         /// <param name="mtype"></param>
         public static void Map(Type etype, IEntityMapper mtype)
         {
-            _entityMapper.AddUpdate(etype, mtype);
+            _entityMapper.Update(etype, mtype);
         }
         /// <summary>
         /// 将类型映射值实体
@@ -23,7 +23,7 @@ namespace Artibition.ORM.Mapper
         /// <param name="mtype"></param>
         public static void Map<TEntity>(IEntityMapper mtype)
         {
-            _entityMapper.AddUpdate(typeof(TEntity), mtype);
+            _entityMapper.Update(typeof(TEntity), mtype);
         }
         /// <summary>
         /// 根据类型获取响应实体
@@ -33,6 +33,11 @@ namespace Artibition.ORM.Mapper
         public static IEntityMapper GetMapper(Type t)
         {
             return _entityMapper[t];
+        }
+
+        public static IEntityMapper GetMapper<TEntity>()
+        {
+            return _entityMapper[typeof(TEntity)];
         }
 
         private static IEnumerable<Type> EnumerateEntityMappers()
@@ -60,7 +65,8 @@ namespace Artibition.ORM.Mapper
         {
             if (!IsMapperRegistered) {
                 foreach (var t in EnumerateEntityMappers()) {
-                    Activator.CreateInstance(t);
+                    if (!t.Name.Contains("EntityMapper"))
+                        Activator.CreateInstance(t);
                 }
                 IsMapperRegistered = true;
             }

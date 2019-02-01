@@ -7,17 +7,15 @@ namespace Artibition.ORM
 {
     public static class DictioanryExtention
     {
-        public static void AddUpdate(this Dictionary<Type, IEntityMapper> dictionary, Type key, IEntityMapper value)
+        public static void Update<T1, T2>(this Dictionary<T1, T2> dictionary, T1 key, T2 value)
         {
-            IEntityMapper obj;
-            if (dictionary.TryGetValue(key, out obj))
-            {
+            T2 exist;
+            if (dictionary.TryGetValue(key, out exist))
                 dictionary[key] = value;
-            }
             else
-            {
                 dictionary.Add(key, value);
-            }
         }
     }
+
+
 }

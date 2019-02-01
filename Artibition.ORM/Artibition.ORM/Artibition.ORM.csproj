@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Mapper\EntityMapper.T.cs" />
     <Compile Remove="SQLBuilder\SQL.Select.cs" />
   </ItemGroup>
 

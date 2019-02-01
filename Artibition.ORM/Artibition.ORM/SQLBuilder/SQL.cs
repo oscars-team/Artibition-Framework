@@ -10,31 +10,37 @@ namespace Artibition.ORM.SQLBuilder
     public partial class SQL : ISQL
     {
         private SQLWhere _where;
+        private Type _lastAliasType;
+        //private List<SQLJOIN> _joins;
+        public SQLAlias Alias { get; private set; }
+        public IEntityMapper SelectorMapper { get; private set; }
+        public Expression SelectorExpression { get; private set; }
         public Expression WhereExpression { get => _where?.GetExpression(); }
         public SQL()
         {
             EntityMapper.RegisterEntityMappers();
+            Alias = new SQLAlias();
         }
 
         #region -- Select 语句处理 --
-        public SQL Select<TEntity>(string alias = null, Expression<Func<TEntity, object>> selector = null)
+        public SQL Select<TEntity>(Expression<Func<TEntity, object>> selector = null)
         {
+            SelectorMapper = EntityMapper.GetMapper<TEntity>();
+            SelectorExpression = selector;
+            _lastAliasType = typeof(TEntity);
             return this;
         }
 
-        public SQL Select<TEntity>(Expression<Func<TEntity, object>> selector)
+        public SQL As(string alias)
         {
+            if (!string.IsNullOrEmpty(alias))
+                Alias.Add(alias, _lastAliasType);
             return this;
         }
 
         #endregion
 
         #region -- Where 语句处理 --
-        public SQLWhere Where<TEntity>(string alias, Expression<Func<TEntity, bool>> where)
-        {
-            _where = new SQLWhere(this, where);
-            return _where;
-        }
         public SQLWhere Where<TEntity>(Expression<Func<TEntity, bool>> where)
         {
             _where = new SQLWhere(this, where);
@@ -44,10 +50,9 @@ namespace Artibition.ORM.SQLBuilder
 
         public string Compile()
         {
-            var compiler = new SQLCompiler();
-            return compiler.Compile(this);
+            var compiler = new SQLCompiler(this);
+            return compiler.Compile();
         }
-
 
     }
 

@@ -11,8 +11,8 @@ namespace Artibition.ORM.SQLBuilder
     /// </summary>
     public interface ISQL
     {
-        SQL Select<TEntity>(string alias = null, Expression<Func<TEntity, object>> selector = null);
-        SQLWhere Where<TEntity>(string alias = null, Expression<Func<TEntity, bool>> where = null);
+        SQL Select<TEntity>(Expression<Func<TEntity, object>> selector = null);
+        SQLWhere Where<TEntity>(Expression<Func<TEntity, bool>> where);
 
         string Compile();
     }
