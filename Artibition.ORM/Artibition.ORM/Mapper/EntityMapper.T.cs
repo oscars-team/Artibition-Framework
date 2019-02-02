@@ -8,12 +8,12 @@ namespace Artibition.ORM.Mapper
 {
     public class EntityMapper<TEntity> : IEntityMapper
     {
-        private string _tableName;
         private List<string> _primaryKeys;
         private List<string> _identityKeys;
         private Dictionary<string, string> _columnNameMapper;
         public string[] Fields { get; private set; }
         public string[] Columns { get; private set; }
+        public string TableName { get; private set; }
         public EntityMapper()
         {
             _primaryKeys = new List<string>();
@@ -103,7 +103,7 @@ namespace Artibition.ORM.Mapper
 
         public EntityMapper<TEntity> Table(string tableName)
         {
-            _tableName = tableName;
+            TableName = tableName;
             return this;
         }
 
@@ -122,7 +122,7 @@ namespace Artibition.ORM.Mapper
 
         public string GetTableName()
         {
-            return _tableName;
+            return TableName;
         }
 
         public string[] GetPrimaryKeys()

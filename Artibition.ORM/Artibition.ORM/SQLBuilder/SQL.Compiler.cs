@@ -20,9 +20,8 @@ namespace Artibition.ORM.SQLBuilder
         {
             Expression selector = Sql.SelectorExpression;
             IEntityMapper selectorMapper = Sql.SelectorMapper;
-            _selectorCompilerStr = new StringBuilder();
+            _selectorCompilerStr = new StringBuilder("SELECT ");
             if (selector == null) {
-                _selectorCompilerStr?.Append("SELECT ");
                 _selectorCompilerStr?.Append(
                     selectorMapper.Columns.Length == 0
                     ? "*"
@@ -30,12 +29,11 @@ namespace Artibition.ORM.SQLBuilder
                 );
             }
             else {
-                _selectorCompilerStr?.Append("SELECT ");
                 this.Visit(selector);
                 _selectorCompilerStr?.TrimComma();
             }
             _selectorCompilerStr?.Append(" FROM ");
-            _selectorCompilerStr?.Append(selectorMapper?.GetTableName());
+            _selectorCompilerStr?.Append(selectorMapper?.TableName);
             return _selectorCompilerStr?.ToString();
         }
         private string compileWhere()
@@ -124,7 +122,7 @@ namespace Artibition.ORM.SQLBuilder
                     else
                         throw new Exception($"SQLCompiler.VisitMember Error: 你正在有意使用别名(As)，但在别名集合中没找到\"{alias}\"。尝试检查在Expression中使用的参数名是否在方法As()中定义过。'");
                 }
-                _selectorCompilerStr?.Append($"{param.Name}.{node.Member.Name},");
+                //_selectorCompilerStr?.Append($"{param.Name}.{node.Member.Name},");
             }
             else if (expression.NodeType == ExpressionType.Constant) {
                 _whereCompilerStr?.Append(value.ToString());

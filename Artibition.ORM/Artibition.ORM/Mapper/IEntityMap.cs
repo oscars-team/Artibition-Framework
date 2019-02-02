@@ -6,13 +6,13 @@ namespace Artibition.ORM.Mapper
 {
     public interface IEntityMapper
     {
-
-        void Register(Type type);
-        string GetTableName();
+        string TableName { get; }
         string[] GetPrimaryKeys();
         string[] GetIdentityKeys();
         string[] Columns { get; }
         string[] Fields { get; }
         string GetColumnName(string column);
+        void Register(Type type);
+
     }
 }
