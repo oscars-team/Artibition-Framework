@@ -8,7 +8,9 @@ namespace Artibition.ORM
     {
         public static StringBuilder TrimComma(this StringBuilder sb)
         {
-            return sb.Remove(sb.Length - 1, 1);
+            if (sb.Length > 0)
+                return sb.Remove(sb.Length - 1, 1);
+            return sb;
         }
     }
 }

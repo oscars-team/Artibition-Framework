@@ -6,7 +6,7 @@ namespace Artibition.ORM.SQLBuilder
 {
     public interface ISQLComponent
     {
-        SQL Sql { get; set; }
+        SQL Sql { get; }
         string Compile();
 
     }

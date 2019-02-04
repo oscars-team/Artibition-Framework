@@ -9,42 +9,22 @@ namespace Artibition.ORM.SQLBuilder
 {
     public partial class SQL : ISQL
     {
-        private SQLWhere _where;
-        private Type _lastAliasType;
-        //private List<SQLJOIN> _joins;
-        public SQLAlias Alias { get; private set; }
-        public IEntityMapper SelectorMapper { get; private set; }
-        public Expression SelectorExpression { get; private set; }
-        public Expression WhereExpression { get => _where?.GetExpression(); }
+        public Dictionary<string, Type> AliasCollection { get; private set; }
+        public ISQLSelect Selector { get; private set; }
+        public List<ISQLJoin> Joins { get; set; }
+        public ISQLWhere Where { get; set; }
+        public List<ISQLOrderBy> Orders { get; set; }
         public SQL()
         {
             EntityMapper.RegisterEntityMappers();
-            Alias = new SQLAlias();
+            AliasCollection = new Dictionary<string, Type>();
         }
 
         #region -- Select 语句处理 --
-        public SQL Select<TEntity>(Expression<Func<TEntity, object>> selector = null)
+        public ISQLSelect Select<TEntity>(Expression<Func<TEntity, object>> selector = null)
         {
-            SelectorMapper = EntityMapper.GetMapper<TEntity>();
-            SelectorExpression = selector;
-            _lastAliasType = typeof(TEntity);
-            return this;
-        }
-
-        public SQL As(string alias)
-        {
-            if (!string.IsNullOrEmpty(alias))
-                Alias.Add(alias, _lastAliasType);
-            return this;
-        }
-
-        #endregion
-
-        #region -- Where 语句处理 --
-        public SQLWhere Where<TEntity>(Expression<Func<TEntity, bool>> where)
-        {
-            _where = new SQLWhere(this, where);
-            return _where;
+            Selector = new SQLSelect(this, typeof(TEntity));
+            return Selector.Select(selector);
         }
         #endregion
 
@@ -53,7 +33,6 @@ namespace Artibition.ORM.SQLBuilder
             var compiler = new SQLCompiler(this);
             return compiler.Compile();
         }
-
     }
 
 
