@@ -1,6 +1,8 @@
 ﻿using Artibition.ORM.Mapper;
+using Artibition.ORM.SQLDialect;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Artibition.ORM
@@ -16,6 +18,22 @@ namespace Artibition.ORM
             }
             else
                 dictionary.Add(key, value);
+        }
+
+        public static SQLParameter AddParameter(this List<SQLParameter> parameters, object value, ParameterDirection direction)
+        {
+            int c = parameters.Count + 1;
+            SQLParameter param = new SQLParameter($"{DialectProvider.PARAM_PREFIX}{c}", value, direction);
+            parameters.Add(param);
+            return param;
+        }
+
+        public static SQLParameter AddParameter(this List<SQLParameter> parameters, object value)
+        {
+            int c = parameters.Count + 1;
+            SQLParameter param = new SQLParameter($"{DialectProvider.PARAM_PREFIX}{c}", value);
+            parameters.Add(param);
+            return param;
         }
     }
 

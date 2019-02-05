@@ -1,6 +1,8 @@
 ﻿using Artibition.ORM.Mapper;
+using Artibition.ORM.SQLDialect;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -14,6 +16,8 @@ namespace Artibition.ORM.SQLBuilder
         public List<ISQLJoin> Joins { get; set; }
         public ISQLWhere Where { get; set; }
         public List<ISQLOrderBy> Orders { get; set; }
+        public List<SQLParameter> Parameters { get; set; }
+
         public SQL()
         {
             EntityMapper.RegisterEntityMappers();

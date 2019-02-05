@@ -1,4 +1,5 @@
 ﻿using Artibition.ORM.Mapper;
+using Artibition.ORM.SQLDialect;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -284,8 +285,10 @@ namespace Artibition.ORM.SQLBuilder
             }
 
             else if (expression.NodeType == ExpressionType.Constant) {
-                _whereCompilerStr?.Append(value.ToString());
-                _currentJoinCompilerStr?.Append(value.ToString());
+                if (Sql.Parameters == null) Sql.Parameters = new List<SQLParameter>();
+                var param = Sql.Parameters.AddParameter(value);
+                _whereCompilerStr?.Append(param.ParameterName);
+                _currentJoinCompilerStr?.Append(param.ParameterName);
             }
             return node;
         }
@@ -345,8 +348,10 @@ namespace Artibition.ORM.SQLBuilder
         protected override Expression VisitConstant(ConstantExpression node)
         {
             // 表达式类似于 p=>p.proprty == 1, p=>p.property == "123"
-            _whereCompilerStr?.Append(node.Value);
-            _currentJoinCompilerStr?.Append(node.Value);
+            if (Sql.Parameters == null) Sql.Parameters = new List<SQLParameter>();
+            var param = Sql.Parameters.AddParameter(node.Value);
+            _whereCompilerStr?.Append(param.ParameterName);
+            _currentJoinCompilerStr?.Append(param.ParameterName);
             return node;
         }
         protected override Expression VisitParameter(ParameterExpression node)
