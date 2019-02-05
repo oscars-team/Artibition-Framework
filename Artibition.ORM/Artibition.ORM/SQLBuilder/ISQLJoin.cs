@@ -20,6 +20,9 @@ namespace Artibition.ORM.SQLBuilder
         ISQLJoin CrossJoin<TJoin, TEntityOther>(Expression<Func<TJoin, TEntityOther, bool>> join);
         ISQLJoin FullJoin<TJoin, TEntityOther>(Expression<Func<TJoin, TEntityOther, bool>> join);
         ISQLWhere Where<TEntity>(Expression<Func<TEntity, bool>> where);
+        ISQLOrderBy OrderBy<TEntity>(Expression<Func<TEntity, object>> order, OrderBy by);
+        ISQLOrderBy OrderByAscending<TEntity>(Expression<Func<TEntity, object>> order);
+        ISQLOrderBy OrderByDescending<TEntity>(Expression<Func<TEntity, object>> order);
         string ComposeTableName();
     }
 

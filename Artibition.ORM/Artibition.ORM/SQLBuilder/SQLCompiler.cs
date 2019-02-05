@@ -59,8 +59,15 @@ namespace Artibition.ORM.SQLBuilder
             ISQLJoin[] joins = Sql.Joins?.ToArray();
             _joinsCompilerStr = new StringBuilder();
             if (joins?.Count() > 0) {
-                foreach (var j in joins)
-                    _joinsCompilerStr.AppendLine(compileJoin(j));
+                ISQLJoin j;
+                int c = joins.Count();
+                for (var i = 0; i < c; i++) {
+                    j = joins[i];
+                    if (i == c - 1)
+                        _joinsCompilerStr.Append(compileJoin(j));
+                    else
+                        _joinsCompilerStr.AppendLine(compileJoin(j));
+                }
             }
             string compileResult = _joinsCompilerStr.ToString();
             _joinsCompilerStr = null;
@@ -142,13 +149,21 @@ namespace Artibition.ORM.SQLBuilder
         {
             StringBuilder sqlBulder = new StringBuilder();
             // 编译Select
-            sqlBulder.AppendLine(compileSelector());
+            string sqlSelect = compileSelector();
+            if (!string.IsNullOrEmpty(sqlSelect))
+                sqlBulder.AppendLine(sqlSelect);
             // 编译Joins
-            sqlBulder.AppendLine(compileJoins());
+            string sqlJoins = compileJoins();
+            if (!string.IsNullOrEmpty(sqlJoins))
+                sqlBulder.AppendLine(sqlJoins);
             // 编译Where
-            sqlBulder.AppendLine(compileWhere());
+            string sqlWhere = compileWhere();
+            if (!string.IsNullOrEmpty(sqlWhere))
+                sqlBulder.AppendLine(sqlWhere);
             // 编译Order
-            sqlBulder.AppendLine(compileOrder());
+            string sqlOrders = compileOrder();
+            if (!string.IsNullOrEmpty(sqlOrders))
+                sqlBulder.AppendLine(sqlOrders);
 
             return sqlBulder.ToString();
         }
@@ -206,8 +221,6 @@ namespace Artibition.ORM.SQLBuilder
             this.Visit(node.Right);
             _whereCompilerStr?.Append(")");
             _currentJoinCompilerStr?.Append(")");
-            //_visitingBinaryLeftSideType = null;
-            //_visitingBinaryRightSideType = null;
             return node;
         }
 
@@ -265,45 +278,8 @@ namespace Artibition.ORM.SQLBuilder
                 }
 
                 if (_currentJoinCompilerStr != null) {
-
-                    //// 如果当前编译的Join已经存在别名， 说明Join两边类型一致，规定左侧为别名类型
-                    //if (expression.Type == _currentCompilingJoin.Type && !string.IsNullOrEmpty(_currentCompilingJoin.Alias) && _visitingBinarySide == VisitingBinarySide.Left) {
-                    //    _currentCompilingJoin.Alias = alias;
-                    //    if (Sql.AliasCollection.ContainsKey(_currentCompilingJoin.Alias))
-                    //        throw new Exception($"SQLCompiler.VisitMember.CompileJoin Error: 别名\"{_currentCompilingJoin.Alias}\"不可用，因为当前上下文中已经定义了别名\"{_currentCompilingJoin.Alias}\"，请确保Join中的别名为全新的别名");
-                    //    Sql.AliasCollection.Update(_currentCompilingJoin.Alias, _currentCompilingJoin.Type);
-                    //}
-                    //// 如果表达式类型等于当前编译Join的Join类型，说明可能找到了别名, 并且当前Join还没有别名， 开始为Join设置别名
-                    //else if (expression.Type == _currentCompilingJoin.Type && string.IsNullOrEmpty(_currentCompilingJoin.Alias)) {
-                    //    _currentCompilingJoin.Alias = alias;
-                    //    if (Sql.AliasCollection.ContainsKey(_currentCompilingJoin.Alias))
-                    //        throw new Exception($"SQLCompiler.VisitMember.CompileJoin Error: 别名\"{_currentCompilingJoin.Alias}\"不可用，因为当前上下文中已经定义了别名\"{_currentCompilingJoin.Alias}\"，请确保Join中的别名为全新的别名");
-                    //    Sql.AliasCollection.Update(_currentCompilingJoin.Alias, _currentCompilingJoin.Type);
-                    //}
+                    // 编译Join语句
                     _currentJoinCompilerStr.Append($"{alias}.{mapper.GetColumnName(node.Member.Name)}");
-                    //if (_visitingBinarySide == VisitingBinarySide.Left) {
-                    //    _visitingBinaryLeftSideType = expression.Type;
-                    //    _visitingBinaryLeftSideAlias = alias;
-                    //}
-
-                    //if (_visitingBinarySide == VisitingBinarySide.Right) {
-                    //    _visitingBinaryRightSideType = expression.Type;
-                    //    _visitingBinaryRightSideAlias = alias;
-
-                    //    if (_visitingBinaryLeftSideType == _currentCompilingJoin.Type && _visitingBinaryRightSideType != _currentCompilingJoin.Type) {
-                    //        // 左侧类型与编译类型相同，而右侧类型与编译类型不同， 取左侧类型为别名
-                    //        _currentCompilingJoin.Alias = _visitingBinaryLeftSideAlias;
-                    //    }
-                    //    else if (_visitingBinaryLeftSideType != _currentCompilingJoin.Type && _visitingBinaryRightSideType == _currentCompilingJoin.Type) {
-                    //        // 左侧类型与编译类型不同，而右侧类型与编译类型相同， 取右侧类型为别名
-                    //        _currentCompilingJoin.Alias = _visitingBinaryRightSideAlias;
-                    //    }
-                    //    else {
-                    //        // 左右侧都相同，去左侧作为别名
-                    //        _currentCompilingJoin.Alias = _visitingBinaryLeftSideAlias;
-                    //    }
-                    //    Sql.AliasCollection.Update(_currentCompilingJoin.Alias, _currentCompilingJoin.Type);
-                    //}
                 }
             }
 

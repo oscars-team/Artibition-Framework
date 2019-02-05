@@ -76,5 +76,32 @@ namespace Artibition.ORM.SQLBuilder
             Sql.Where = sqlWhere;
             return sqlWhere;
         }
+
+        public ISQLOrderBy OrderBy<TEntity>(Expression<Func<TEntity, object>> order, OrderBy by)
+        {
+            if (Sql.Orders == null)
+                Sql.Orders = new List<ISQLOrderBy>();
+            SQLOrderBy sqlOrder = new SQLOrderBy(Sql, order, by);
+            Sql.Orders.Add(sqlOrder);
+            return sqlOrder;
+        }
+
+        public ISQLOrderBy OrderByAscending<TEntity>(Expression<Func<TEntity, object>> order)
+        {
+            if (Sql.Orders == null)
+                Sql.Orders = new List<ISQLOrderBy>();
+            SQLOrderBy sqlOrder = new SQLOrderBy(Sql, order, SQLBuilder.OrderBy.ASC);
+            Sql.Orders.Add(sqlOrder);
+            return sqlOrder;
+        }
+
+        public ISQLOrderBy OrderByDescending<TEntity>(Expression<Func<TEntity, object>> order)
+        {
+            if (Sql.Orders == null)
+                Sql.Orders = new List<ISQLOrderBy>();
+            SQLOrderBy sqlOrder = new SQLOrderBy(Sql, order, SQLBuilder.OrderBy.DESC);
+            Sql.Orders.Add(sqlOrder);
+            return sqlOrder;
+        }
     }
 }
