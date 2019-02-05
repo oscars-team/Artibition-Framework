@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Artibition.ORM\Artibition.ORM\Artibition.ORM.csproj" />
+    <ProjectReference Include="..\Artibition.ORM\Artibition.ORM.csproj" />
   </ItemGroup>
 
 </Project>
