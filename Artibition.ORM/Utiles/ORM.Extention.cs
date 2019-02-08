@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Artibition.ORM
@@ -12,5 +13,6 @@ namespace Artibition.ORM
                 return sb.Remove(sb.Length - 1, 1);
             return sb;
         }
+
     }
 }

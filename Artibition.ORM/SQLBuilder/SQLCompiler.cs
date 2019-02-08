@@ -42,7 +42,7 @@ namespace Artibition.ORM.SQLBuilder
                 _selectorCompilerStr.Append(
                     selectorMapper.Columns.Length == 0
                     ? sqlSelect.ComposeSelectKey("*")
-                    : string.Join(", ", selectorMapper.Columns.Select(p => sqlSelect.ComposeSelectKey(p)))
+                    : string.Join(", ", selectorMapper.Fields.Select(p => $"{sqlSelect.ComposeSelectKey(selectorMapper.GetColumnName(p))} AS {p}"))
                 );
             }
             else {
@@ -247,7 +247,7 @@ namespace Artibition.ORM.SQLBuilder
                         Sql.Selector.Alias = alias;
                     }
                     Sql.AliasCollection.Update(alias, Sql.Selector.Type);
-                    _selectorCompilerStr?.Append($"{Sql.Selector.ComposeSelectKey(mapper.GetColumnName(node.Member.Name))},");
+                    _selectorCompilerStr?.Append($"{Sql.Selector.ComposeSelectKey(mapper.GetColumnName(node.Member.Name))} AS {node.Member.Name},");
                 }
 
                 if (_whereCompilerStr != null) {

@@ -11,16 +11,16 @@ namespace Artibition.ORM.Mapper
     {
         private List<string> _primaryKeys;
         private List<string> _identityKeys;
-        private Dictionary<string, string> _columnNameMapper;
+
         public string[] Fields { get; private set; }
         public string[] Columns { get; private set; }
         public string TableName { get; private set; }
-
+        public Dictionary<string, string> ColumnMapper { get; private set; }
         public EntityMapper()
         {
             _primaryKeys = new List<string>();
             _identityKeys = new List<string>();
-            _columnNameMapper = new Dictionary<string, string>();
+            ColumnMapper = new Dictionary<string, string>();
         }
         public EntityMapper PrimaryKeys<TEntity>(Expression<Func<TEntity, object>> selector)
         {
@@ -43,13 +43,13 @@ namespace Artibition.ORM.Mapper
                     case ExpressionType.MemberAccess:
                         name = (columnLambda.Body as MemberExpression).Member.Name;
                         // 映射到列
-                        _columnNameMapper.Update(name, columnName);
+                        ColumnMapper.Update(name, columnName);
                         break;
                     case ExpressionType.Convert:
                         var operand = (columnLambda.Body as UnaryExpression).Operand as MemberExpression;
                         name = operand.Member.Name;
                         // 映射到列
-                        _columnNameMapper.Update(name, columnName);
+                        ColumnMapper.Update(name, columnName);
                         break;
                 }
             }
@@ -61,7 +61,7 @@ namespace Artibition.ORM.Mapper
                 throw new Exception("EntityMapper.GetColumn() Error: column name is empty");
 
             string columnName;
-            if (!_columnNameMapper.TryGetValue(column, out columnName)) {
+            if (!ColumnMapper.TryGetValue(column, out columnName)) {
                 return column;
             }
             return columnName;
