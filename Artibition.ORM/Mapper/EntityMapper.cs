@@ -55,6 +55,11 @@ namespace Artibition.ORM.Mapper
             }
             return this;
         }
+        /// <summary>
+        /// 获取列名，如果映射中没取到返回字段名称
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
         public string GetColumnName(string column)
         {
             if (string.IsNullOrEmpty(column))

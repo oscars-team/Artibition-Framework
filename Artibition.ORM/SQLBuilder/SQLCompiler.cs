@@ -19,10 +19,6 @@ namespace Artibition.ORM.SQLBuilder
         private StringBuilder _joinsCompilerStr;
         private StringBuilder _currentJoinCompilerStr;
         private ISQLJoin _currentCompilingJoin;
-        //Type _visitingBinaryLeftSideType;
-        //Type _visitingBinaryRightSideType;
-        //string _visitingBinaryLeftSideAlias;
-        //string _visitingBinaryRightSideAlias;
 
         public SQLCompiler(SQL sql)
         {

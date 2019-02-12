@@ -5,22 +5,25 @@ using System.Text;
 
 namespace Test
 {
-    public class Window
+    public class Network
     {
         public string id { get; set; }
         public string name { get; set; }
-        public Network network { get; set; }
+        public string title { get; set; }
+        public string images { get; set; }
+
     }
 
-    public class WindowMapper : EntityMapper<Window>
+    public class NetworkMapper : EntityMapper<Network>
     {
-        public WindowMapper()
+        public NetworkMapper()
         {
-            this.Table("Windows")
+            this.Table("Networks")
                 .PrimaryKeys(p => p.id)
                 .Column(p => p.id, "Id")
+                .Column(p => p.images, "Images")
                 .Column(p => p.name, "Name")
-                .Column(p => p.network, "Network")
+                .Column(p => p.title, "Title")
                 .Register();
         }
     }
