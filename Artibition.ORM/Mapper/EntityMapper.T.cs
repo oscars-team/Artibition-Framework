@@ -22,6 +22,12 @@ namespace Artibition.ORM.Mapper
         }
         public EntityMapper<TEntity> PrimaryKeys(Expression<Func<TEntity, object>> selector)
         {
+            // 只有 p=>p.property 这种形式才为有效值
+            if (selector.NodeType == ExpressionType.Lambda && (selector as LambdaExpression).Body.NodeType == ExpressionType.MemberAccess) {
+                // 成员名称
+                var name = ((selector as LambdaExpression).Body as MemberExpression).Member.Name;
+                _primaryKeys.Add(name);
+            }
             return this;
         }
 

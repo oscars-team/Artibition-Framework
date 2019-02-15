@@ -9,7 +9,7 @@ namespace Test
     {
         public string id { get; set; }
         public string name { get; set; }
-        public Network network { get; set; }
+        public string network { get; set; }
     }
 
     public class WindowMapper : EntityMapper<Window>
@@ -20,7 +20,7 @@ namespace Test
                 .PrimaryKeys(p => p.id)
                 .Column(p => p.id, "Id")
                 .Column(p => p.name, "Name")
-                .Column(p => p.network, "Network")
+                .Column(p => p.network, "NetworkId")
                 .Register();
         }
     }

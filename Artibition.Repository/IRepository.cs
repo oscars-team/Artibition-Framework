@@ -7,7 +7,7 @@ namespace Artibition.Repository
     {
         IDbConnection Connection { get; }
 
-        TEntity GetSingle<TEntity>(params object[] keyValues);
+        TEntity GetSingle<TEntity>(object keyValue);
 
     }
 }
