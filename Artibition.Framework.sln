@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Artibition.ORM", "Artibitio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{E6E29C3E-9FFB-4477-82ED-3F33D7DF3721}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artibition.Repository", "Artibition.Repository\Artibition.Repository.csproj", "{56982C4F-5DDA-4506-AE18-17F1CC7D04AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E6E29C3E-9FFB-4477-82ED-3F33D7DF3721}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E29C3E-9FFB-4477-82ED-3F33D7DF3721}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6E29C3E-9FFB-4477-82ED-3F33D7DF3721}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56982C4F-5DDA-4506-AE18-17F1CC7D04AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56982C4F-5DDA-4506-AE18-17F1CC7D04AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56982C4F-5DDA-4506-AE18-17F1CC7D04AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56982C4F-5DDA-4506-AE18-17F1CC7D04AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
